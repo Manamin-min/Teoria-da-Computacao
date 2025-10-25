@@ -1,0 +1,109 @@
+//3a) Fibonacci
+
+//funcao para limpar variável
+operation clear(A) {
+    1: if zero A then goto 0 else goto 2
+    2: do dec A goto 1
+}
+
+//funcao de soma
+// A = A + B usando C
+operation soma(A, B) {
+    1: if zero B then goto 5 else goto 2
+    2: do dec B goto 3
+    3: do inc A goto 4
+    4: do inc C goto 1
+    5: if zero C then goto 0 else goto 6
+    6: do dec C goto 7
+    7: do inc B goto 5
+}
+
+//funcao para atribuir o mesmo valor de uma variavel em outra variavel 
+// A = B usando C
+operation load(A, B) {
+    1: do clear(A) goto 2
+    2: do soma(A, B) goto 0
+}
+
+//funcao para subtracao
+// I = I - J
+operation sub(I, J){
+    1: do load(I1, I) goto 2
+    2: do load(J1, J) goto 3
+    3: if zero J1 then goto 7 else goto 4
+    4: if zero I1 then goto 7 else goto 5 
+    5: do dec I1 goto 6
+    6: do dec J1 goto 3
+    7: do load(I, I1) goto 0
+}
+
+//funcao de divisao, o resultado armazenado na variável Q
+//A = A / B (Q = quociente)
+operation div(A, B) {
+    1: do clear(Q) goto 2
+    2: if zero A then goto 7 else goto 3
+    3: if zero B then goto 7 else goto 4
+    4: do inc Q goto 5
+    5: do sub(A, B) goto 6
+    6: if zero A then goto 7 else goto 4
+    7: do load(A, Q) goto 0
+}
+
+//testa se é ímpar ou não para definir a saída certa, pegando o valor do resultado das variaveis RESULT1 e RESULT2
+//caso fibonnacci par fica na variavel RESULT1 e armazena na variavel de saida Y, caso fibonnacci impar pega valor de RESULT2 e armazena na variavel de saida Y
+operation imparounao(M) {
+	1: do load(BOX1, M) goto 2
+	2: do add CONST 2 goto 3
+	3: do div(BOX1, CONST) goto 4
+	4: if cmp J1 1 then goto 5 else goto 6
+	5: do load(Y, RESULT2) goto 0
+	6: do load(Y, RESULT1) goto 0  
+}
+
+//calculo do fibonacci
+operation fibonacci(N) {
+
+    1: if cmp N 1 then goto 17 else goto 2
+	2: if cmp N 2 then goto 17 else goto 3
+	3: if cmp N 3 then goto 18 else goto 4
+
+    //faz o calculo do F(n > 3)
+    //transforma A em contador, para fazer a iteracao do fibonnacci 
+
+	4: do load(CONTADOR, N) goto 5
+    5: do sub CONTADOR 4 goto 6
+	6: do add VAR1 1 goto 7
+	7: do add VAR2 2 goto 8
+    8: do soma(VAR1, VAR2) goto 9
+    9: do load(RESULT1, VAR1) goto 10
+    10: do soma(VAR2, RESULT1) goto 11
+    11: do load(RESULT2, VAR2) goto 12
+    12: do dec CONTADOR goto 13
+    13: if zero CONTADOR then goto 0 else goto 14
+    14: do soma(RESULT1, RESULT2) goto 15
+    15: do load(RESULT2, RESULT1) goto 16
+    16: do dec CONTADOR goto 8
+	17: do add Y 1 goto 0
+	18: do add Y 2 goto 0
+}
+
+main {
+//coloca a entrada na variavel A, para nao alterar o valor
+    1: do load(A, X) goto 2
+
+//se o F(1), F(2) ou F(3) o resultado ja armazena o valor de 1 para F(1) e F(2) e o valor de 2 para F(3), 
+    2: if cmp A 1 then goto 7 else goto 3
+    3: if cmp A 2 then goto 7 else goto 4
+    4: if cmp A 3 then goto 8 else goto 5
+
+//se nao, calcula o valor de F(n)
+    5: do fibonacci(A) goto 6
+
+//depois de calcular o fibonnacci vai para a funcao par ou impar, para armazenar o valor de saida correta na variavel Y
+    6: do imparounao(A) goto 0
+    7: do add Y 1 goto 0
+    8: do add Y 2 goto 0
+}            
+
+
+ 
