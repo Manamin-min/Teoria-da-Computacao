@@ -1,0 +1,123 @@
+// Questão 1c
+// Y = 1 se X é primo
+// Y = 0 se X não for primo
+
+// limpa U
+operation clear(U) {
+    1: if zero U then goto 0 else goto 2
+    2: do dec U goto 1
+}
+
+// K = K + L
+operation add(K, L) {
+    1: if zero L then goto 5 else goto 2
+    2: do dec L goto 3
+    3: do inc K goto 4
+    4: do inc C goto 1
+    5: if zero C then goto 0 else goto 6
+    6: do dec C goto 7
+    7: do inc L goto 5
+}
+
+// A = B
+operation load(A, B) {
+    1: do clear(A) goto 2
+    2: do add(A, B) goto 0
+}
+
+// I = I - J
+operation sub(I, J){
+    1: do load(I1, I) goto 2
+    2: do load(J1, J) goto 3
+
+    // loop principal
+    3: if zero J1 then goto 7 else goto 4
+    4: if zero I1 then goto 7 else goto 5 
+    5: do dec I1 goto 6
+    6: do dec J1 goto 3
+
+    7: do load(I, I1) goto 0
+}
+
+// Testa se F < G
+test lessThan(F, G) {
+    1: do load(F1, F) goto 2
+    2: do load(G1, G) goto 3
+
+    // loop de testes se F1 ou G1 já chegou em 0
+    3: if zero F1 then goto 4 else goto 5
+    4: if zero G1 then goto false else goto true
+    5: if zero G1 then goto false else goto 6
+
+    6: do dec F1 goto 7
+    7: do dec G1 goto 3
+}
+
+// A = dividendo, B = divisor, R = resto, Q = quociente
+operation divMod(A, B, R, Q) {
+    1: do clear(R) goto 2
+    2: do clear(Q) goto 3
+
+    3: if zero A then goto 0 else goto 4
+    4: if zero B then goto 0 else goto 5
+    
+    5: do load(R, A) goto 6
+
+    // loop principal
+    6: if lessThan(R, B) then goto 0 else goto 7
+    7: do inc Q goto 8
+    8: do sub(R, B) goto 6
+}
+
+// X <= 1
+test umOuZero(N){
+    1: do load(N1, N) goto 2
+    2: if zero N1 then goto true else goto 3
+    3: do dec N1 goto 4
+    4: if zero N1 then goto true else goto false
+}
+
+// Testa se X é primo
+test isPrime(X) {
+    // Testa se X ≤ 1
+    1: if umOuZero(X) then goto false else goto 2
+    
+    // Testa se X = 2
+    2: do load(TEMP, X) goto 3
+    3: do sub(TEMP, DOIS) goto 4
+    4: if zero TEMP then goto true else goto 5
+    
+    // Inicializa divisor D = 2
+    5: do load(D, DOIS) goto 6
+    
+    // Loop: testa divisores de 2 até X-1
+    6: do load(TEMP, X) goto 7
+    7: do sub(TEMP, D) goto 8
+    8: if zero TEMP then goto false else goto 9
+    
+    // Testa se X é divisível por D
+    9: do divMod(X, D, R, Q) goto 10
+    10: if zero R then goto false else goto 11
+    
+    // Próximo divisor
+    11: do inc D goto 12
+    12: do load(TEMP, D) goto 13
+    13: do load(COMP, X) goto 14
+    14: do sub(COMP, TEMP) goto 15
+    15: if zero COMP then goto true else goto 6
+}
+
+main {
+    // Inicializa constantes
+    1: do add DOIS 2 goto 2
+    
+    // Testa se X é primo
+    2: if isPrime(X) then goto 4 else goto 3
+    
+    // não é primo
+    3: do clear(Y) goto 0
+    
+    // é primo
+    4: do clear(Y) goto 5
+    5: do inc Y goto 0
+}
