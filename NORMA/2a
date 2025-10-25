@@ -1,4 +1,5 @@
-//2a) foo(x) = 2x, x^2
+// 2. a)
+// função foo(2X, X²)
 
 operation clear(U) {
     1: if zero U then goto 0 else goto 2
@@ -33,12 +34,6 @@ operation sub(I, J){
     7: do load(I, I1) goto 0
 }
 
-test ehUm(NUM){
-    1: do load(N, NUM) goto 2
-    2: do dec N goto 3
-    3: if zero N then goto true else goto false
-}
-
 // A = A/B
 operation div(A, B) {
     1: do clear(Q) goto 2
@@ -51,43 +46,7 @@ operation div(A, B) {
     7: do load(A, Q) goto 0
 }
 
-// Testa se F < G
-test lessThan(F, G) {
-    1: do load(F1, F) goto 2
-    2: do load(G1, G) goto 3
-
-    // loop principal de teste se F1 ou G1 já chegou em 0
-    3: if zero F1 then goto 4 else goto 5
-    4: if zero G1 then goto false else goto true
-    5: if zero G1 then goto false else goto 6
-
-    6: do dec F1 goto 7
-    7: do dec G1 goto 3
-}
-
-// A = dividendo, B = divisor, R = resto
-operation divMod(A, B, R, Q) {
-    1: do clear(R) goto 2
-    2: do clear(Q) goto 3
-    3: if zero A then goto 0 else goto 4
-    
-    4: if zero B then goto 0 else goto 5
-    
-    5: do load(R, A) goto 6
-
-    // laço principal
-    6: if lessThan(R, B) then goto 0 else goto 7
-    7: do inc Q goto 8
-    8: do sub(R, B) goto 6
-
-}
-
-test ehPar(NUM){
-    1: do load(NUM1, NUM) goto 2
-    2: do divMod(NUM1, DOIS, R, Q) goto 3
-    3: if zero R then goto true else goto false
-}
-
+// A = A * B
 operation mult(A,B){
 	1: do clear(M) goto 2
 	2: do load(MM,B) goto 3
@@ -97,6 +56,7 @@ operation mult(A,B){
 	6: do load(A,M) goto 0
 }
 
+// RESULT = BASE ^ EXP
 operation pow(BASE, EXP, RESULT) {
   1: do clear(RESULT) goto 2
   2: do inc RESULT goto 3
@@ -106,18 +66,20 @@ operation pow(BASE, EXP, RESULT) {
   6: do dec E goto 4
 }
 
+// SAIDA = 2^A
 operation pow2(A, SAIDA) {
   1: do load(BASE, DOIS) goto 2
   2: do pow(BASE, A, SAIDA) goto 0
 }
 
-
+// operação específica para X na codificação quando for ímpar
 operation xImpar(X1, B){
     1: do dec X1 goto 2
     2: do div(X1, DOIS) goto 3
     3: do load(B, X1) goto 0
 }
 
+// função foo que calcula f(X) = (2X, X²)
 operation foo(X1, DOISX, XQUADRADO){
     1: do load(X1_COPIA, X1) goto 2
     2: do mult(X1_COPIA, DOIS) goto 3
@@ -125,14 +87,22 @@ operation foo(X1, DOISX, XQUADRADO){
     4: do pow(X1, DOIS, XQUADRADO) goto 0
 }
 
-// decod: chama codA e xImpar
+// decod
 operation decod(C, A_in, B_in) {
+    // faz a copia para não alterar o valor de B_in
     1: do load(B1, B_in) goto 2
+    // B1 = B1 * 2
     2: do mult(B1, DOIS) goto 3
     3: do inc B1 goto 4
+
+    // faz a copia de A_in
     4: do load(A1, A_in) goto 5
+    // POT2 = 2^A1
     5: do pow2(A1, POT2) goto 6
+    // POT2 = POT2 * B1
     6: do mult(POT2, B1) goto 7
+
+    // C vai receber o valor final que no main vai ser Y
     7: do load(C, POT2) goto 0
 }
 
@@ -143,6 +113,6 @@ main{
     4: do inc UM goto 5
     5: do load(Xcopia, X) goto 6
 
-    6: do foo(Xcopia, Xdois, Xquatrado) goto 7
-    7: do decod(Y, Xdois, Xquatrado) goto 0
+    6: do foo(Xcopia, Xdois, Xquadrado) goto 7
+    7: do decod(Y, Xdois, Xquadrado) goto 0
 }
