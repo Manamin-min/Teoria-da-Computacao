@@ -1,0 +1,123 @@
+// b) f(x) = (8!)/x!*(8-x)! 
+
+//funcao para limpar variável
+operation clear(A) {
+    1: if zero A then goto 0 else goto 2
+    2: do dec A goto 1
+}
+
+//funcao de soma
+// A = A + B usando C
+operation soma(A, B) {
+    1: if zero B then goto 5 else goto 2
+    2: do dec B goto 3
+    3: do inc A goto 4
+    4: do inc C goto 1
+    5: if zero C then goto 0 else goto 6
+    6: do dec C goto 7
+    7: do inc B goto 5
+}
+
+//funcao para atribuir o mesmo valor de uma variavel em outra variavel
+// A = B usando C
+operation load(A, B) {
+    1: do clear(A) goto 2
+    2: do soma(A, B) goto 0
+}
+
+//funcao de multiplicacao
+// B = A * B usando E e D (nao é possivel usar C pois ele e usado no load)
+operation mult(A, B) {
+    1: do load(E, B) goto 2
+    2: do load(D, A) goto 3
+    3: do dec D goto 4
+    4: if zero D then goto 6 else goto 5
+    5: do soma(B, E) goto 3
+    6: do clear(E) goto 0
+}
+
+//funcao de subtracao
+// I = I - J
+operation sub(I, J){
+    1: do load(I1, I) goto 2
+    2: do load(J1, J) goto 3
+    3: if zero J1 then goto 7 else goto 4
+    4: if zero I1 then goto 7 else goto 5 
+    5: do dec I1 goto 6
+    6: do dec J1 goto 3
+    7: do load(I, I1) goto 0
+}
+
+//funcao de divisao
+//A = A / B (Q = quociente)
+operation div(A, B) {
+    1: do clear(Q) goto 2
+    2: if zero A then goto 7 else goto 3
+    3: if zero B then goto 7 else goto 4
+    4: do inc Q goto 5
+    5: do sub(A, B) goto 6
+    6: if zero A then goto 7 else goto 4
+    7: do load(A, Q) goto 0
+}
+
+
+//fatorial x!
+operation fat(F) {
+
+    //carrega o valor de A em X1 e X2
+    1: do load(X1, A) goto 2
+    2: do load(X2, A) goto 3
+
+    //subtrai 1 da variavel X2, 
+    3: do dec X2 goto 4
+ 
+    //em seguida faz a multiplicacao de n*n-1, armazena o resultado na variavel BOX1
+    4: do mult(X1, X2) goto 5
+    5: do load(BOX1, X2) goto 6
+    6: do load(X2, A) goto 7
+
+    //subtrai os valores ja utilizados para multiplicar para continuar o fatorial
+    7: do dec X2 goto 8
+    8: do dec X1 goto 9
+    9: do dec X1 goto 10
+
+    //multiplica novamente os valores ja subtraidos e vai fazendo a multiplicacao, entrando em um loop ate o X1 ser 0.
+   10: do mult(X1, BOX1) goto 11
+   11: if zero X1 then goto 0 else goto 9
+}
+
+
+main {
+
+    //armazena o valor de X na variavel A para nao alterar o valor de entrada
+    1: do load(A, X) goto 2
+
+    //constante de 8! = 40320
+    2: do add CONST 40320 goto 3
+
+    //constante de 8 
+    3: do add CONST2 8 goto 4
+
+    //(8-x)
+    4: do sub(CONST2, X) goto 5
+    5: do load(A, I1) goto 6
+
+    //fatorial de (8-x)
+    6: do fat(A) goto 7
+    7: do load(VAR1, BOX1) goto 8
+    8: do load(A, X) goto 9
+
+    //fatorial de X 
+    9: do fat(X) goto 10
+   10: do load(VAR2, BOX1) goto 11
+
+   //multiplicacao de x!*(8-x)!  
+   11: do mult(VAR2, VAR1) goto 12
+   12: do load(VAR3, VAR1) goto 13
+
+   //e por final faz a divisao de todos os valores ja calculado
+   //(8!)/x!*(8-x)! 
+   13: do div(CONST, VAR3) goto 14
+   14: do load(Y, Q) goto 0
+}
+  
