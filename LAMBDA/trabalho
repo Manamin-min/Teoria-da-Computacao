@@ -1,0 +1,108 @@
+--TRABALHO 2 LAMBDA
+
+let
+    -- booleanas
+    true = \x y. x;
+    false = \x y. y;
+    if = \b. \e1. \e2. b e1 e2;
+    not = \b. if b false true;
+    and = \b1. \b2. if b1 b2 false;
+    or = \b1. \b2. if b1 true b2;
+
+    -- aritmeticas
+    inc = \n. (\A. \B. A (n A B));
+    add = \n1. \n2. (\A. \B. n1 A (n2 A B));
+    mult = \n1 n2. \A B. n1 (n2 A) B;
+    isZero = \n. n (\x. false) true;
+    exp = \n1. \n2. n2 n1;
+
+    -- estruturas
+    pair = \A B. \c. c A B;
+    fst = \n. n true;
+    snd = \n. n false;
+    swap = \p. pair (snd p) (fst p);
+    shift_inc = \p. pair (snd p) (inc (snd p));
+    pred = \n. fst (n shift_inc (pair 0 0));
+    sub = \n1. \n2. n2 pred n1;
+    
+    -- testes
+    empty = \x. true;
+    isEmpty = \i. i (\A B. false);
+    head = \p. fst p;
+    tail = \p. snd p;
+    cons = pair;
+
+    -- Y operator
+    Y = \f. (\x. f (x x)) (\x. f (x x));
+
+
+    igual = \a b. and (isZero (sub a b)) (isZero (sub b a));
+    menor = \x y. and (isZero(sub x y)) (not (igual x y));
+
+
+    S_mod = \R. \x y. if (menor x y) x (R (sub x y) y);
+    mod = Y S_mod;
+
+
+    -- Divisão por 2
+    div2_S = \R. \n. if (isZero n) 0
+                    (if (isZero (pred n))  0
+                        (inc (R (sub n 2))));
+    div2 = Y div2_S;
+
+
+-- a) Menor ou igual
+-- numero -> boolean
+    menorIgual = \x y. or (menor x y) (igual x y);
+
+
+-- b) Polinomio de a e b
+-- numero -> numero
+    polinomio = \a b. add (exp a 3) (mult b 2);
+
+
+-- c) Calcula a
+-- numero -> numero
+    calcula = \a. add (exp 2 (div2 a)) a;  
+
+
+-- d) Multiplo de 3 (booleano)
+-- numero -> boolean      
+    multiplo3 = \n. isZero (mod n 3); 
+
+
+-- e) Inversão da fração      
+-- numero -> numero   
+    invFrac = \p.
+        if (menor 0 (fst p))
+            (swap p)        -- retorna (b,a) se a > 0
+            p;              -- retorna (a,b) se a = 0
+
+
+-- f) Soma da fração
+-- numero -> numero
+    somaFrac = \p1 p2. pair (add (mult (fst p1) (snd p2)) 
+                                 (mult (snd p1) (fst p2))) 
+                                 (mult (snd p1) (snd p2)); 
+  
+ 
+-- g) Produz lista
+-- numero -> lista
+    SprodLista = \R. \l.  if (isEmpty l)
+                             1
+                             (mult (head l) (R (tail l)));
+    prodLista = Y SprodLista;
+
+
+-- h) Concatena listas: append l1 l2 = 
+--     se l1 vazia → l2
+--     senão        → cons (head l1) (append (tail l1) l2)
+-- lista -> lista
+
+
+
+    Sconcatena = \R. \l1. \l2.  if (isEmpty l1)
+                   l2
+                   (cons (head l1) (R (tail l1) l2));
+
+    concatena = Y Sconcatena;
