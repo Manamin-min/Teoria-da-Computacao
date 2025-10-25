@@ -1,0 +1,72 @@
+// QUESTÃO 1d
+// Y = (X mod 3)
+
+operation clear(U) {
+    1: if zero U then goto 0 else goto 2
+    2: do dec U goto 1
+}
+
+// K = K + L
+operation add(K, L) {
+    1: if zero L then goto 5 else goto 2
+    2: do dec L goto 3
+    3: do inc K goto 4
+    4: do inc C goto 1
+    5: if zero C then goto 0 else goto 6
+    6: do dec C goto 7
+    7: do inc L goto 5
+}
+
+// A = B
+operation load(A, B) {
+    1: do clear(A) goto 2
+    2: do add(A, B) goto 0
+}
+
+// I = I - J
+operation sub(I, J){
+    1: do load(I1, I) goto 2
+    2: do load(J1, J) goto 3
+    3: if zero J1 then goto 7 else goto 4
+    4: if zero I1 then goto 7 else goto 5 
+    5: do dec I1 goto 6
+    6: do dec J1 goto 3
+    7: do load(I, I1) goto 0
+}
+
+// Testa se F < G
+test lessThan(F, G) {
+    1: do load(F1, F) goto 2
+    2: do load(G1, G) goto 3
+
+    // loop principal de teste se F1 ou G1 já chegou em 0
+    3: if zero F1 then goto 4 else goto 5
+    4: if zero G1 then goto false else goto true
+    5: if zero G1 then goto false else goto 6
+
+    6: do dec F1 goto 7
+    7: do dec G1 goto 3
+}
+
+// A = dividendo, B = divisor, R = resto
+operation divMod(A, B, R, Q) {
+    1: do clear(R) goto 2
+    2: do clear(Q) goto 3
+    3: if zero A then goto 0 else goto 4
+    
+    4: if zero B then goto 0 else goto 5
+    
+    5: do load(R, A) goto 6
+
+    // laço principal
+    6: if lessThan(R, B) then goto 0 else goto 7
+    7: do inc Q goto 8
+    8: do sub(R, B) goto 6
+
+}
+
+main {
+   1: do add TRES 3 goto 2
+   2: do divMod(X, TRES, RESTO, QUOCIENTE) goto 3
+   3: do load(Y, RESTO) goto 0
+}
