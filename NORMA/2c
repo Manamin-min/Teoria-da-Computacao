@@ -1,0 +1,189 @@
+// 2c
+// a NAND b = 1 se a != B
+// a NAND b = 0 se a == B
+
+operation clear(U) {
+    1: if zero U then goto 0 else goto 2
+    2: do dec U goto 1
+}
+
+// K = K + L
+operation add(K, L) {
+    1: if zero L then goto 5 else goto 2
+    2: do dec L goto 3
+    3: do inc K goto 4
+    4: do inc C goto 1
+    5: if zero C then goto 0 else goto 6
+    6: do dec C goto 7
+    7: do inc L goto 5
+}
+
+// A = B
+operation load(A, B) {
+    1: do clear(A) goto 2
+    2: do add(A, B) goto 0
+}
+
+// I = I - J
+operation sub(I, J){
+    1: do load(I1, I) goto 2
+    2: do load(J1, J) goto 3
+    3: if zero J1 then goto 7 else goto 4
+    4: if zero I1 then goto 7 else goto 5 
+    5: do dec I1 goto 6
+    6: do dec J1 goto 3
+    7: do load(I, I1) goto 0
+}
+
+// A = A/B
+operation div(A, B) {
+    1: do clear(Q) goto 2
+    2: if zero A then goto 7 else goto 3
+    3: if zero B then goto 7 else goto 4
+
+    4: do sub(A, B) goto 5
+    5: do inc Q goto 6
+    6: if zero A then goto 7 else goto 4
+    7: do load(A, Q) goto 0
+}
+
+// Testa se F < G
+test lessThan(F, G) {
+    1: do load(F1, F) goto 2
+    2: do load(G1, G) goto 3
+
+    // loop principal de teste se F1 ou G1 já chegou em 0
+    3: if zero F1 then goto 4 else goto 5
+    4: if zero G1 then goto false else goto true
+    5: if zero G1 then goto false else goto 6
+
+    6: do dec F1 goto 7
+    7: do dec G1 goto 3
+}
+
+// A = dividendo, B = divisor, R = resto, Q = quociente
+operation divMod(A, B, R, Q) {
+    1: do clear(R) goto 2
+    2: do clear(Q) goto 3
+    3: if zero A then goto 0 else goto 4
+    
+    4: if zero B then goto 0 else goto 5
+    
+    5: do load(R, A) goto 6
+
+    // laço principal
+    6: if lessThan(R, B) then goto 0 else goto 7
+    7: do inc Q goto 8
+    8: do sub(R, B) goto 6
+
+}
+
+test ehPar(NUM){
+    1: do load(NUM1, NUM) goto 2
+    2: do divMod(NUM1, DOIS, R, Q) goto 3
+    3: if zero R then goto true else goto false
+}
+
+// retorna CONT QUE VAI SER A
+operation codA(ENTRADA, CONT){
+    1: do clear(CONT) goto 2
+    2: if ehPar(ENTRADA) then goto 3 else goto 0
+
+    3: do div(ENTRADA, DOIS) goto 4
+    4: do inc CONT goto 5
+    5: if zero ENTRADA then goto 0 else goto 6
+    6: if ehPar(ENTRADA) then goto 3 else goto 0
+}
+
+// A = A * B
+operation mult(A,B){
+	1: do clear(M) goto 2
+	2: do load(MM,B) goto 3
+	3: do add(M,A) goto 4
+	4: do dec MM goto 5
+	5: if zero MM then goto 6 else goto 3
+	6: do load(A,M) goto 0
+}
+
+// RESULT = BASE ^ EXP
+operation pow(BASE, EXP, RESULT) {
+  1: do clear(RESULT) goto 2
+  2: do inc RESULT goto 3
+  3: do load(E, EXP) goto 4
+  4: if zero E then goto 0 else goto 5
+  5: do mult(RESULT, BASE) goto 6
+  6: do dec E goto 4
+}
+
+// SAIDA = 2 ^ A
+operation pow2(A, SAIDA) {
+  1: do load(BASE, DOIS) goto 2
+  2: do pow(BASE, A, SAIDA) goto 0
+}
+
+operation codB(X_COPIA, VAR_A, VAR_B){
+    1: if ehPar(X_COPIA) then goto 3 else goto 2
+    // para x = 0 ou x ímpar, temos uma outra operação para extrair o b
+    2: if zero X_COPIA then goto 8 else goto 3
+    
+    // b = [(X/2^a) - 1] / 2
+    3: do pow2(VAR_A, DOIS_ELEV) goto 4
+    4: do div(X_COPIA, DOIS_ELEV) goto 5
+    5: do dec X_COPIA goto 6
+    6: do div(X_COPIA, DOIS) goto 7
+    7: do load(VAR_B, X_COPIA) goto 0
+
+    8: do xImpar(X_COPIA, VAR_B) goto 0
+}
+
+// B = (X - 1) / 2
+operation xImpar(X1, B){
+    1: do dec X1 goto 2
+    2: do div(X1, DOIS) goto 3
+    3: do load(B, X1) goto 0
+}
+
+// retorna valores de a e b a partir do valor de X e das funções de codificação
+operation codificador(VAR_A, VAR_B, COPIA_X){
+    1: do load(COPIA_X1, COPIA_X) goto 2
+    2: do codA(COPIA_X, VAR_A) goto 3
+    3: do load(COPIA_A, VAR_A) goto 4
+    4: do codB(COPIA_X1, COPIA_A, VAR_B) goto 0
+}
+
+// normaliza um valor qualquer em 0 ou 1
+// OUT = 0 se IN = 0, OUT = 1 se IN > 0
+operation normalize(IN, OUT) {
+    1: if zero IN then goto 2 else goto 3
+    2: do clear(OUT) goto 0
+    3: do clear(OUT) goto 4
+    4: do inc OUT goto 0
+}
+
+// NAND(A,B,R) → R = NAND(A,B) em {0,1}
+operation nand(A,B,R) {
+    1: do normalize(A, A1) goto 2
+    2: do normalize(B, B1) goto 3
+
+    // testa se A1 == 1
+    3: if zero A1 then goto 8 else goto 4
+
+    // A1 = 1, agora testa B1
+    4: if zero B1 then goto 8 else goto 5
+
+    // caso A1=1 e B1=1 → NAND = 0
+    5: do clear(R) goto 0
+
+    // caso contrário → NAND = 1
+    8: do clear(R) goto 9
+    9: do inc R goto 0
+}
+
+main{
+    1: do clear(DOIS) goto 2
+    2: do add DOIS 2 goto 3
+    3: do load(Xcopia, X) goto 4
+
+    4: do codificador(A_VAR, B_VAR, Xcopia) goto 5
+    5: do nand(A_VAR, B_VAR, Y) goto 0
+}
