@@ -1,1 +1,64 @@
 
+// Questão 1a
+// Y = 2^[X/2] + X
+
+// limpa variável
+operation clear(U) {
+    1: if zero U then goto 0 else goto 2
+    2: do dec U goto 1
+}
+
+// R = R + S
+operation add(R, S) {
+    1: if zero S then goto 5 else goto 2
+    2: do dec S goto 3
+    3: do inc R goto 4
+    4: do inc T goto 1
+    5: if zero T then goto 0 else goto 6
+    6: do dec T goto 7
+    7: do inc S goto 5
+}
+
+// E = F
+operation load(E, F) {
+    1: do clear(E) goto 2
+    2: do add(E, F) goto 0
+}
+
+// A = A / 2 (arrendondado pra cima)
+operation divBy2(A){
+    1: if zero A then goto 4 else goto 2
+    2: do sub A 2 goto 3
+    3: do inc N goto 1
+    4: do load(A,N) goto 5
+    5: do clear(N) goto 0
+}
+
+// B = A * 2
+operation mult2(A, B) {
+    1: do clear(B) goto 2
+    2: do add(B, A) goto 3
+    3: do add(B, A) goto 0
+}
+
+// W = 2^Q
+operation pow(Q, W) {
+    1: do clear(W) goto 2
+    2: do inc W goto 3
+    3: do load(P, Q) goto 4
+    4: if zero P then goto 0 else goto 5
+    5: do mult2(W, H) goto 6
+    6: do load(W, H) goto 7
+    7: do dec P goto 4
+}
+
+main {
+    // S = X
+    1: do load(S, X) goto 2
+    2: do divBy2(X) goto 3
+    3: do pow(X, Z) goto 4
+
+    // Z + S (S continha o valor de X)
+    4: do add(Z, S) goto 5
+    5: do load(Y, Z) goto 0
+}
